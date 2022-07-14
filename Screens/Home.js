@@ -1,93 +1,91 @@
 import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
-  Keyboard,
   FlatList,
   Image,
 } from "react-native";
 
-export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const [details, setDetails] = useState();
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const apiKey = "5879194321834ea8bdc805b90a28158d";
-  const apiUrl = `https://api.rawg.io/api/games?key=${apiKey}&dates=2019-10-10,2022-07-07&ordering=-added`;
-
-  async function apiCall() {
-    setLoading(true);
-    let resp = await fetch(apiUrl);
-    let respJson = await resp.json();
-    setDetails(respJson);
-    setLoading(false);
+    this.state = {
+      data: [],
+    };
   }
 
-  useEffect(() => {
-    setLoading(true);
-    apiCall();
-  }, []);
+  async apiCall() {
+    let resp = await fetch(
+      `https://api.rawg.io/api/games?key=5879194321834ea8bdc805b90a28158d&dates=2019-10-10,2022-07-07&ordering=-added`
+    );
+    let respJson = await resp.json();
+    //console.warn(respJson);
+    this.setState({ data: respJson.results });
+  }
 
-  return (
-    <View style={styles.container}>
-      <Text
-        style={{
-          fontSize: 55,
-          fontWeight: "800",
-          width: "90%",
-          color: "#3EC70B",
-        }}
-      >
-        RMVGDB
-      </Text>
-      <Text style={{ flex: 1, color: "#fff", fontSize: 25 }}>
-        {" "}
-        Hottest Games:
-      </Text>
-      <SafeAreaView style={{ flex: 1 }}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#3EC70B" />
-        ) : (
+  componentDidMount() {
+    this.apiCall();
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontSize: 35, fontWeight: "700", color: "#3EC70B" }}>
+          RMVGDB
+        </Text>
+        <Text style={{ color: "#fff", fontSize: 25, paddingBottom: 10 }}>
+          Hottest Games:
+        </Text>
+        <SafeAreaView style={styles.results}>
           <FlatList
-            style={styles.games}
-            data={details}
-            keyExtractor={id}
+            data={this.state.data}
+            contentContainerStyle={{ paddingBottom: 70 }}
             renderItem={({ item }) => (
-              <View style={styles.game}>
+              <View>
                 <Image
-                  style={styles.image}
-                  source={{ uri: `${item.details.image_background}` }}
+                  source={{ uri: item.background_image }}
+                  style={{
+                    width: "100%",
+                    height: 300,
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                  }}
+                  resizeMode="stretch"
                 />
+                <Text style={styles.heading}>{item.slug}</Text>
               </View>
             )}
-          ></FlatList>
-        )}
-      </SafeAreaView>
-    </View>
-  );
+          />
+        </SafeAreaView>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#51557E",
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 50,
+    paddingTop: 70,
+    paddingHorizontal: 10,
   },
-  label: {
-    fontSize: 15,
-    width: "60%",
-    color: "#008080",
-    fontWeight: "700",
-  },
-  image: {
+  results: {
     width: "100%",
-    height: 200,
-    borderRadius: 20,
+    marginBottom: 10,
+  },
+  heading: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+    padding: 10,
+    paddingBottom: 10,
+    backgroundColor: "#2C3639",
   },
 });
+
+export default Home;
