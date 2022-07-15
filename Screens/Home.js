@@ -10,10 +10,11 @@ import {
 } from "react-native";
 
 class Home extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.state = {
+      loading: false,
       data: [],
     };
   }
@@ -23,8 +24,9 @@ class Home extends React.Component {
       `https://api.rawg.io/api/games?key=5879194321834ea8bdc805b90a28158d&dates=2019-10-10,2022-07-07&ordering=-added`
     );
     let respJson = await resp.json();
+    this.setState({ loading: true });
     //console.warn(respJson);
-    this.setState({ data: respJson.results });
+    this.setState({ data: respJson.results, loading: false });
   }
 
   componentDidMount() {
@@ -32,6 +34,15 @@ class Home extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ActivityIndicator size="large" color="#3EC70B" />
+        </View>
+      );
+    }
     return (
       <View style={styles.container}>
         <Text style={{ fontSize: 35, fontWeight: "700", color: "#3EC70B" }}>

@@ -10,8 +10,8 @@ import {
 } from "react-native";
 
 class Upcoming extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this.state = {
       data: [],
